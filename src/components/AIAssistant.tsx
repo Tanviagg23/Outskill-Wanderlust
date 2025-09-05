@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Send, X, MessageCircle, Zap, Globe, Calendar, DollarSign, Brain } from 'lucide-react';
+import { Sparkles, Send, X, MessageCircle, Zap, Globe, Calendar, DollarSign, Brain, AlertCircle } from 'lucide-react';
+import { geminiService } from '../services/geminiService';
 
 interface Message {
   id: string;
@@ -19,6 +20,7 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [conversationContext, setConversationContext] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -28,7 +30,9 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         const welcomeMessage: Message = {
           id: '1',
           type: 'ai',
-          content: "Hi! I'm your AI travel assistant. I can help you plan trips, find destinations, manage budgets, and answer any travel questions. What would you like to explore today?",
+          content: geminiService.isConfigured() 
+            ? "Hi! I'm your AI travel assistant powered by Gemini. I can help you plan trips, find destinations, manage budgets, and answer any travel questions. What would you like to explore today?"
+            : "Hi! I'm your AI travel assistant. I can help you plan trips, find destinations, manage budgets, and answer any travel questions. Note: For enhanced AI responses, please configure your Gemini API key. What would you like to explore today?",
           timestamp: new Date(),
           suggestions: [
             "Plan a 7-day trip to Japan",
@@ -58,60 +62,45 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
     setInputValue('');
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Generate AI response using Gemini
+      const aiResponseText = await geminiService.generateResponse(inputValue, conversationContext);
+      const suggestions = await geminiService.generateTravelSuggestions(inputValue);
+      
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         type: 'ai',
-        content: generateAIResponse(inputValue),
+        content: aiResponseText,
         timestamp: new Date(),
-        suggestions: generateSuggestions(inputValue)
+        suggestions: suggestions
       };
+      
       setMessages(prev => [...prev, aiResponse]);
+      
+      // Update conversation context (keep last few exchanges)
+      setConversationContext(prev => {
+        const newContext = `${prev}\nUser: ${inputValue}\nAssistant: ${aiResponseText}`;
+        // Keep only last 1000 characters to avoid token limits
+        return newContext.slice(-1000);
+      });
+      
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      const errorResponse: Message = {
+        id: (Date.now() + 1).toString(),
+        type: 'ai',
+        content: "I'm sorry, I encountered an error while processing your request. Please try again.",
+        timestamp: new Date(),
+        suggestions: [
+          "Try rephrasing your question",
+          "Ask about popular destinations",
+          "Get help with trip planning",
+          "Find budget travel tips"
+        ]
+      };
+      setMessages(prev => [...prev, errorResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
-  };
-
-  const generateAIResponse = (input: string): string => {
-    const lowerInput = input.toLowerCase();
-    
-    if (lowerInput.includes('japan')) {
-      return "Japan is an incredible destination! For a 7-day trip, I'd recommend spending 3 days in Tokyo exploring districts like Shibuya and Asakusa, 2 days in Kyoto for temples and traditional culture, and 2 days in Osaka for amazing food. The best time to visit is spring (March-May) for cherry blossoms or fall (September-November) for beautiful foliage. Budget around $150-200 per day including accommodation, meals, and activities.";
-    } else if (lowerInput.includes('europe') && lowerInput.includes('budget')) {
-      return "For budget-friendly European destinations, consider Eastern Europe! Prague, Budapest, and Krakow offer incredible value with stunning architecture, rich history, and delicious food. Portugal and parts of Spain are also great options. You can travel comfortably on $50-80 per day. I can help you create a detailed itinerary with specific recommendations for accommodations and activities.";
-    } else if (lowerInput.includes('bali')) {
-      return "Bali is best visited during the dry season from April to October, with July-August being peak season. For fewer crowds and great weather, consider May-June or September. The island offers diverse experiences from beach relaxation in Seminyak to cultural immersion in Ubud and adventure activities around Mount Batur. Budget around $40-60 per day for a comfortable experience.";
-    } else if (lowerInput.includes('paris')) {
-      return "Paris is magical year-round! For a perfect itinerary, I'd suggest: Day 1-2: Classic sights (Eiffel Tower, Louvre, Notre-Dame area), Day 3: Montmartre and Sacré-Cœur, Day 4: Versailles day trip, Day 5: Latin Quarter and Seine river cruise. Don't miss trying authentic French pastries and visiting local markets. Would you like specific restaurant recommendations or museum tips?";
-    } else {
-      return "That's a great question! I'd be happy to help you with that. Based on your interests, I can provide personalized recommendations for destinations, create detailed itineraries, help with budget planning, suggest the best times to travel, and much more. What specific aspect of travel planning would you like to focus on?";
-    }
-  };
-
-  const generateSuggestions = (input: string): string[] => {
-    const lowerInput = input.toLowerCase();
-    
-    if (lowerInput.includes('japan')) {
-      return [
-        "Show me a detailed Tokyo itinerary",
-        "What's the cost breakdown for Japan?",
-        "Best areas to stay in Kyoto",
-        "Japanese cultural etiquette tips"
-      ];
-    } else if (lowerInput.includes('europe')) {
-      return [
-        "Create a 2-week Europe itinerary",
-        "Best European cities for first-time visitors",
-        "How to travel between European countries",
-        "European food experiences not to miss"
-      ];
-    } else {
-      return [
-        "Help me plan a romantic getaway",
-        "Find family-friendly destinations",
-        "Adventure travel recommendations",
-        "Best destinations for solo travelers"
-      ];
     }
   };
 
@@ -131,12 +120,20 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center animate-pulse">
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
+              geminiService.isConfigured() 
+                ? 'bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse' 
+                : 'bg-gray-400'
+            }`}>
               <Brain className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">AI Travel Assistant</h3>
-              <p className="text-sm text-gray-500">Always here to help</p>
+              <h3 className="font-semibold text-gray-900">
+                AI Travel Assistant {geminiService.isConfigured() && <span className="text-xs text-purple-600">• Powered by Gemini</span>}
+              </h3>
+              <p className="text-sm text-gray-500">
+                {geminiService.isConfigured() ? 'Always here to help' : 'Configure API key for enhanced responses'}
+              </p>
             </div>
           </div>
           <button
@@ -146,6 +143,19 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* API Key Warning */}
+        {!geminiService.isConfigured() && (
+          <div className="mx-6 mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl flex items-start space-x-2">
+            <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+            <div className="text-sm">
+              <p className="text-yellow-800 font-medium">Enhanced AI features unavailable</p>
+              <p className="text-yellow-700">
+                Add your Gemini API key to <code className="bg-yellow-100 px-1 rounded">.env</code> file as <code className="bg-yellow-100 px-1 rounded">VITE_GEMINI_API_KEY</code> for smarter responses.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">

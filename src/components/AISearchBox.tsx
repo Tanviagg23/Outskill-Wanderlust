@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Sparkles, MapPin, Calendar, Users, Mic, X, Zap } from 'lucide-react';
+import { geminiService } from '../services/geminiService';
 
 interface SearchSuggestion {
   id: string;
@@ -21,6 +22,7 @@ export default function AISearchBox({ value, onChange, onSearch }: AISearchBoxPr
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
 
   const aiSuggestions: SearchSuggestion[] = [
     {
@@ -54,18 +56,51 @@ export default function AISearchBox({ value, onChange, onSearch }: AISearchBoxPr
   ];
 
   useEffect(() => {
-    if (value.length > 0) {
-      const filtered = aiSuggestions.filter(suggestion =>
-        suggestion.title.toLowerCase().includes(value.toLowerCase()) ||
-        suggestion.subtitle.toLowerCase().includes(value.toLowerCase())
-      );
-      setSuggestions(filtered);
-      setShowSuggestions(true);
-    } else {
+    const generateSuggestions = async () => {
+      if (value.length > 2 && geminiService.isConfigured()) {
+        setIsGeneratingSuggestions(true);
+        try {
+          const aiSuggestionTexts = await geminiService.generateTravelSuggestions(value);
+          const dynamicSuggestions: SearchSuggestion[] = aiSuggestionTexts.map((text, index) => ({
+            id: `ai-${index}`,
+            type: 'ai-suggestion',
+            title: text,
+            subtitle: 'AI-generated suggestion',
+            icon: Sparkles
+          }));
+          setSuggestions(dynamicSuggestions);
+        } catch (error) {
+          console.error('Error generating AI suggestions:', error);
+          setSuggestions(aiSuggestions);
+        } finally {
+          setIsGeneratingSuggestions(false);
+        }
+        setShowSuggestions(true);
+      } else if (value.length > 0) {
+        const filtered = aiSuggestions.filter(suggestion =>
+          suggestion.title.toLowerCase().includes(value.toLowerCase()) ||
+          suggestion.subtitle.toLowerCase().includes(value.toLowerCase())
+        );
+        setSuggestions(filtered);
+        setShowSuggestions(true);
+      } else {
+        setSuggestions(aiSuggestions);
+        setShowSuggestions(isFocused);
+      }
+    };
+
+    const debounceTimer = setTimeout(generateSuggestions, 300);
+    return () => clearTimeout(debounceTimer);
+  }, [value, isFocused]);
+
+  useEffect(() => {
+    if (value.length === 0) {
       setSuggestions(aiSuggestions);
       setShowSuggestions(isFocused);
+    } else {
+      setShowSuggestions(isFocused);
     }
-  }, [value, isFocused]);
+  }, [isFocused]);
 
   const handleVoiceSearch = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -103,8 +138,8 @@ export default function AISearchBox({ value, onChange, onSearch }: AISearchBoxPr
             <Search className={`w-5 h-5 transition-colors duration-200 ${
               isFocused ? 'text-blue-500' : 'text-gray-400'
             }`} />
-            {value && (
-              <Sparkles className="w-4 h-4 text-purple-500 animate-pulse" />
+            {(value || isGeneratingSuggestions) && (
+              <Sparkles className={`w-4 h-4 text-purple-500 ${isGeneratingSuggestions ? 'animate-spin' : 'animate-pulse'}`} />
             )}
           </div>
           
@@ -164,7 +199,12 @@ export default function AISearchBox({ value, onChange, onSearch }: AISearchBoxPr
             <div className="p-4">
               <div className="flex items-center space-x-2 mb-3">
                 <Sparkles className="w-4 h-4 text-purple-500" />
-                <span className="text-sm font-medium text-gray-700">AI-Powered Suggestions</span>
+                <span className="text-sm font-medium text-gray-700">
+                  {geminiService.isConfigured() ? 'AI-Powered Suggestions' : 'Quick Suggestions'}
+                </span>
+                {isGeneratingSuggestions && (
+                  <div className="w-3 h-3 border border-purple-500 border-t-transparent rounded-full animate-spin" />
+                )}
               </div>
               
               <div className="space-y-1">
@@ -192,7 +232,7 @@ export default function AISearchBox({ value, onChange, onSearch }: AISearchBoxPr
                         {suggestion.subtitle}
                       </div>
                     </div>
-                    {suggestion.type === 'ai-suggestion' && (
+                    {suggestion.type === 'ai-suggestion' && geminiService.isConfigured() && (
                       <div className="px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full font-medium">
                         AI
                       </div>
