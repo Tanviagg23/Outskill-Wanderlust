@@ -48,6 +48,7 @@ import PackingListModal from './components/PackingListModal';
 import WeatherAlert from './components/WeatherAlert';
 import TestimonialsSection from './components/TestimonialsSection';
 import ImageCarousel from './components/ImageCarousel';
+import BudgetPlannerModal from './components/BudgetPlannerModal';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -416,49 +417,24 @@ function App() {
               <div className="flex flex-col space-y-4">
                 <button 
                   onClick={() => {setActiveTab('home'); setIsMenuOpen(false);}}
-                  className={`text-left font-medium transition-colors duration-200 ${
-                    activeTab === 'home' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
-                  }`}
+                  className="text-left text-blue-600 font-medium"
                 >
                   Home
                 </button>
                 <button 
                   onClick={() => {setActiveTab('explore'); setIsMenuOpen(false);}}
-                  className={`text-left font-medium transition-colors duration-200 ${
-                    activeTab === 'explore' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
-                  }`}
+                  className="text-left text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
                 >
                   Explore
                 </button>
                 <button 
                   onClick={() => {setActiveTab('gallery'); setIsMenuOpen(false);}}
-                  className={`text-left font-medium transition-colors duration-200 ${
-                    activeTab === 'gallery' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
-                  }`}
+                  className="text-left text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
                 >
                   Gallery
                 </button>
-                <button 
-                  onClick={() => {setShowBudgetPlanner(true); setIsMenuOpen(false);}}
-                  className="text-left text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
-                >
-                  Budget Planner
-                </button>
-                <button 
-                  onClick={() => {setActiveTab('itinerary'); setIsMenuOpen(false);}}
-                  className={`text-left font-medium transition-colors duration-200 ${
-                    activeTab === 'itinerary' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
-                  }`}
-                >
-                  My Trips
-                </button>
-                <button 
-                  onClick={() => {setActiveTab('weather'); setIsMenuOpen(false);}}
-                  className={`text-left font-medium transition-colors duration-200 ${
-                    activeTab === 'weather' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
-                  }`}
-                >
-                  Weather
+                <button className="text-left text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
+                  About
                 </button>
               </div>
             </div>
