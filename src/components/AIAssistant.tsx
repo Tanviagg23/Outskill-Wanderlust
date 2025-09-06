@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Send, X, MessageCircle, Zap, Globe, Calendar, DollarSign, Brain, AlertCircle } from 'lucide-react';
+import { Sparkles, Send, X, MessageCircle, Zap, Globe, Calendar, DollarSign, Brain, AlertCircle, Mic } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
+import VoiceAssistant from './VoiceAssistant';
 
 interface Message {
   id: string;
@@ -21,6 +22,7 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [conversationContext, setConversationContext] = useState('');
+  const [showVoiceAssistant, setShowVoiceAssistant] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -136,12 +138,21 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               </p>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-all duration-200"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setShowVoiceAssistant(true)}
+              className="p-2 text-blue-500 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-all duration-200 transform hover:scale-110"
+              title="Voice Assistant"
+            >
+              <Mic className="w-5 h-5" />
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-all duration-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* API Key Warning */}
@@ -238,6 +249,12 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           </div>
         </div>
       </div>
+
+      {/* Voice Assistant Modal */}
+      <VoiceAssistant 
+        isOpen={showVoiceAssistant} 
+        onClose={() => setShowVoiceAssistant(false)} 
+      />
     </div>
   );
 }
