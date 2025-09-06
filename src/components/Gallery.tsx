@@ -27,7 +27,7 @@ const galleryImages: GalleryImage[] = [
   },
   {
     id: '2',
-    url: 'https://www.pexels.com/photo/four-girl-s-sitting-on-gray-concrete-floor-under-blue-sky-1464815/?auto=compress&cs=tinysrgb&w=800',
+    url: 'https://images.pexels.com/photos/402028/pexels-photo-402028.jpeg?auto=compress&cs=tinysrgb&w=800',
     title: 'Kyoto Temple',
     location: 'Kyoto, Japan',
     photographer: 'Takeshi Yamamoto',
