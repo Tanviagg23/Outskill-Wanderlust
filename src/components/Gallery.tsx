@@ -16,7 +16,7 @@ interface GalleryImage {
 const galleryImages: GalleryImage[] = [
   {
     id: '1',
-    url: 'https://images.pexels.com/photos/161853/santorini-oia-greece-water-161853.jpeg?auto=compress&cs=tinysrgb&w=800',
+    url: 'https://images.pexels.com/photos/1285625/pexels-photo-1285625.jpeg?auto=compress&cs=tinysrgb&w=800',
     title: 'Santorini Sunset',
     location: 'Oia, Greece',
     photographer: 'Maria Komninos',

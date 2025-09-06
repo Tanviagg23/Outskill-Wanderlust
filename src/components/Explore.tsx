@@ -25,7 +25,7 @@ const destinations: Destination[] = [
     name: 'Santorini',
     country: 'Greece',
     continent: 'Europe',
-    image: 'https://images.pexels.com/photos/161853/santorini-oia-greece-water-161853.jpeg?auto=compress&cs=tinysrgb&w=800',
+    image: 'https://images.pexels.com/photos/1285625/pexels-photo-1285625.jpeg?auto=compress&cs=tinysrgb&w=800',
     rating: 4.9,
     reviews: 2847,
     price: 1200,
