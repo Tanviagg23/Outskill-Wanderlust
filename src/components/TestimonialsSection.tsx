@@ -26,7 +26,7 @@ const testimonials: Testimonial[] = [
     date: '2024-01-15',
     type: 'video',
     content: 'This platform made planning my Bali trip absolutely seamless. The AI recommendations were spot-on, and I discovered hidden gems I never would have found otherwise. The itinerary planning feature saved me hours of research!',
-    videoUrl: 'https://app.heygen.com/videos/452e1e02d4854476b1289808ceeea57f',
+    videoUrl: 'https://player.vimeo.com/video/1116381494?badge=0&autopause=0&player_id=0&app_id=58479',
     videoThumbnail: 'https://images.pexels.com/photos/1559821/pexels-photo-1559821.jpeg?auto=compress&cs=tinysrgb&w=400',
     avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
     tripType: 'Adventure & Culture'
