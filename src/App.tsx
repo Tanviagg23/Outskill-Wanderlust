@@ -149,7 +149,7 @@ function App() {
       name: 'Kerala',
       country: 'India',
       images: [
-        'https://images.pexels.com/photos/3889855/pexels-photo-3889855.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=800'
       ],
       rating: 4.7,
       reviews: 1923,
