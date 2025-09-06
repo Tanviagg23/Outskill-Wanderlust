@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Sparkles, Send, X, MessageCircle, Zap, Globe, Calendar, DollarSign, Brain, AlertCircle, Mic } from 'lucide-react';
+import { Sparkles, Send, X, MessageCircle, Zap, Globe, Calendar, DollarSign, Brain, AlertCircle, Mic, User, Bot } from 'lucide-react';
 import { geminiService } from '../services/geminiService';
 import VoiceAssistant from './VoiceAssistant';
 
@@ -16,6 +16,8 @@ interface AIAssistantProps {
   onClose: () => void;
 }
 
+type AgentType = 'selection' | 'voice' | 'chat';
+
 export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -23,32 +25,53 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [conversationContext, setConversationContext] = useState('');
   const [showVoiceAssistant, setShowVoiceAssistant] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState<AgentType>('selection');
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
-      // Add welcome message if no messages exist
-      if (messages.length === 0) {
-        const welcomeMessage: Message = {
-          id: '1',
-          type: 'ai',
-          content: geminiService.isConfigured() 
-            ? "Hi! I'm your AI travel assistant powered by Gemini. I can help you plan trips, find destinations, manage budgets, and answer any travel questions. What would you like to explore today?"
-            : "Hi! I'm your AI travel assistant. I can help you plan trips, find destinations, manage budgets, and answer any travel questions. Note: For enhanced AI responses, please configure your Gemini API key. What would you like to explore today?",
-          timestamp: new Date(),
-          suggestions: [
-            "Plan a 7-day trip to Japan",
-            "Find budget-friendly destinations in Europe",
-            "What's the best time to visit Bali?",
-            "Create an itinerary for Paris"
-          ]
-        };
-        setMessages([welcomeMessage]);
-      }
+      // Reset to selection screen when opening
+      setSelectedAgent('selection');
+      setMessages([]);
+      setConversationContext('');
     } else {
       setIsVisible(false);
+      setShowVoiceAssistant(false);
     }
-  }, [isOpen, messages.length]);
+  }, [isOpen]);
+
+  const handleAgentSelection = (agentType: 'voice' | 'chat') => {
+    setSelectedAgent(agentType);
+    
+    if (agentType === 'voice') {
+      // Open voice assistant immediately
+      setShowVoiceAssistant(true);
+    } else {
+      // Initialize chat with Jess
+      const welcomeMessage: Message = {
+        id: '1',
+        type: 'ai',
+        content: geminiService.isConfigured() 
+          ? "Hi! I'm Jess, your AI travel assistant powered by Gemini. I can help you plan trips, find destinations, manage budgets, and answer any travel questions. What would you like to explore today?"
+          : "Hi! I'm Jess, your AI travel assistant. I can help you plan trips, find destinations, manage budgets, and answer any travel questions. Note: For enhanced AI responses, please configure your Gemini API key. What would you like to explore today?",
+        timestamp: new Date(),
+        suggestions: [
+          "Plan a 7-day trip to Japan",
+          "Find budget-friendly destinations in Europe",
+          "What's the best time to visit Bali?",
+          "Create an itinerary for Paris"
+        ]
+      };
+      setMessages([welcomeMessage]);
+    }
+  };
+
+  const handleBackToSelection = () => {
+    setSelectedAgent('selection');
+    setMessages([]);
+    setConversationContext('');
+    setShowVoiceAssistant(false);
+  };
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -112,6 +135,101 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
 
   if (!isOpen) return null;
 
+  // Agent Selection Screen
+  if (selectedAgent === 'selection') {
+    return (
+      <div className={`fixed inset-0 z-50 flex items-end justify-end p-6 transition-all duration-300 ${
+        isVisible ? 'bg-black/20 backdrop-blur-sm' : 'bg-black/0'
+      }`}>
+        <div className={`w-96 bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200/60 transition-all duration-500 ${
+          isVisible ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 translate-y-8'
+        }`}>
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-gray-200/60">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                <Brain className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-900">AI Travel Assistant</h3>
+                <p className="text-sm text-gray-500">Choose your preferred assistant</p>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-all duration-200"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Agent Selection */}
+          <div className="p-6 space-y-4">
+            <h4 className="text-lg font-semibold text-gray-900 text-center mb-6">
+              How would you like to get assistance?
+            </h4>
+
+            {/* Voice Agent - Maya */}
+            <button
+              onClick={() => handleAgentSelection('voice')}
+              className="w-full p-6 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-3xl hover:border-purple-300 hover:shadow-lg transition-all duration-300 transform hover:scale-105 group"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Mic className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-left">
+                  <h5 className="text-xl font-bold text-gray-900 mb-1">Voice Assistant</h5>
+                  <p className="text-purple-600 font-medium mb-2">Meet Maya</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Have a natural conversation about your travel plans. Maya can help you plan trips through voice interaction.
+                  </p>
+                  <div className="flex items-center space-x-2 mt-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-600 font-medium">Voice-powered by VAPI</span>
+                  </div>
+                </div>
+              </div>
+            </button>
+
+            {/* Chat Agent - Jess */}
+            <button
+              onClick={() => handleAgentSelection('chat')}
+              className="w-full p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-3xl hover:border-blue-300 hover:shadow-lg transition-all duration-300 transform hover:scale-105 group"
+            >
+              <div className="flex items-center space-x-4">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <MessageCircle className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-left">
+                  <h5 className="text-xl font-bold text-gray-900 mb-1">Chat Assistant</h5>
+                  <p className="text-blue-600 font-medium mb-2">Meet Jess</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Chat with Jess for detailed travel planning, destination research, and personalized recommendations.
+                  </p>
+                  <div className="flex items-center space-x-2 mt-3">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-600 font-medium">Powered by Gemini AI</span>
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
+
+          {/* Footer */}
+          <div className="p-6 pt-0">
+            <div className="bg-gray-50 rounded-2xl p-4">
+              <p className="text-sm text-gray-600 text-center">
+                Both assistants are designed to help you plan amazing trips. Choose the interaction style you prefer!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Chat Interface (Jess)
   return (
     <div className={`fixed inset-0 z-50 flex items-end justify-end p-6 transition-all duration-300 ${
       isVisible ? 'bg-black/20 backdrop-blur-sm' : 'bg-black/0'
@@ -124,14 +242,15 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           <div className="flex items-center space-x-3">
             <div className={`w-10 h-10 rounded-2xl flex items-center justify-center ${
               geminiService.isConfigured() 
-                ? 'bg-gradient-to-r from-purple-500 to-pink-500 animate-pulse' 
+                ? 'bg-gradient-to-r from-blue-500 to-indigo-500 animate-pulse' 
                 : 'bg-gray-400'
             }`}>
-              <Brain className="w-5 h-5 text-white" />
+              <User className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">
-                AI Travel Assistant {geminiService.isConfigured() && <span className="text-xs text-purple-600">• Powered by Gemini</span>}
+              <h3 className="font-semibold text-gray-900 flex items-center space-x-2">
+                <span>Jess - Chat Assistant</span>
+                {geminiService.isConfigured() && <span className="text-xs text-blue-600">• Powered by Gemini</span>}
               </h3>
               <p className="text-sm text-gray-500">
                 {geminiService.isConfigured() ? 'Always here to help' : 'Configure API key for enhanced responses'}
@@ -140,11 +259,11 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
           </div>
           <div className="flex items-center space-x-2">
             <button
-              onClick={() => setShowVoiceAssistant(true)}
-              className="p-2 text-blue-500 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-all duration-200 transform hover:scale-110"
-              title="Voice Assistant"
+              onClick={handleBackToSelection}
+              className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-all duration-200"
+              title="Back to agent selection"
             >
-              <Mic className="w-5 h-5" />
+              <Bot className="w-5 h-5" />
             </button>
             <button
               onClick={onClose}
@@ -236,7 +355,7 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Ask me anything about travel..."
+              placeholder="Ask Jess anything about travel..."
               className="flex-1 px-4 py-3 bg-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all duration-200"
             />
             <button
@@ -253,7 +372,10 @@ export default function AIAssistant({ isOpen, onClose }: AIAssistantProps) {
       {/* Voice Assistant Modal */}
       <VoiceAssistant 
         isOpen={showVoiceAssistant} 
-        onClose={() => setShowVoiceAssistant(false)} 
+        onClose={() => {
+          setShowVoiceAssistant(false);
+          handleBackToSelection();
+        }} 
       />
     </div>
   );
