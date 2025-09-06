@@ -60,6 +60,7 @@ function App() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showCollaborateModal, setShowCollaborateModal] = useState(false);
   const [showPackingModal, setShowPackingModal] = useState(false);
+  const [showBudgetPlanner, setShowBudgetPlanner] = useState(false);
 
   const handleSearch = (query: string) => {
     console.log('Searching for:', query);
