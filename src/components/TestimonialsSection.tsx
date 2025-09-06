@@ -109,23 +109,32 @@ export default function TestimonialsSection() {
             <div className="relative h-96 lg:h-auto">
               {currentTestimonial.type === 'video' ? (
                 <div className="relative h-full">
-                  <img
-                    src={currentTestimonial.videoThumbnail}
-                    alt={`${currentTestimonial.name} testimonial`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <button
-                      onClick={() => toggleVideo(currentTestimonial.id)}
-                      className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 transform hover:scale-110 shadow-2xl"
-                    >
-                      {playingVideo === currentTestimonial.id ? (
-                        <Pause className="w-8 h-8 text-blue-600 ml-1" />
-                      ) : (
-                        <Play className="w-8 h-8 text-blue-600 ml-1" />
-                      )}
-                    </button>
-                  </div>
+                  {playingVideo === currentTestimonial.id ? (
+                    <iframe
+                      src={currentTestimonial.videoUrl}
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allow="autoplay; encrypted-media"
+                      allowFullScreen
+                      title={`${currentTestimonial.name} testimonial video`}
+                    />
+                  ) : (
+                    <>
+                      <img
+                        src={currentTestimonial.videoThumbnail}
+                        alt={`${currentTestimonial.name} testimonial`}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <button
+                          onClick={() => toggleVideo(currentTestimonial.id)}
+                          className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 transform hover:scale-110 shadow-2xl"
+                        >
+                          <Play className="w-8 h-8 text-blue-600 ml-1" />
+                        </button>
+                      </div>
+                    </>
+                  )}
                   <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                     Video Testimonial
                   </div>
