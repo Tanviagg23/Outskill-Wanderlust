@@ -112,7 +112,7 @@ export default function VoiceAssistant({ isOpen, onClose }: VoiceAssistantProps)
         <div className="flex items-center justify-between mb-8">
           <div>
             <h3 className="text-xl font-bold text-gray-900">Voice Assistant</h3>
-            <p className="text-sm text-gray-600">AI-powered travel planning</p>
+            <p className="text-sm text-gray-600">Maya - AI-powered travel planning</p>
           </div>
           <button
             onClick={onClose}
@@ -207,7 +207,7 @@ export default function VoiceAssistant({ isOpen, onClose }: VoiceAssistantProps)
           {callState === 'idle' && (
             <>
               <p className="text-gray-600 text-sm">
-                Click the phone button to start a voice conversation with your AI travel assistant
+                Click the phone button to start a voice conversation with Maya, your AI travel assistant
               </p>
               <p className="text-gray-500 text-xs">
                 Powered by VAPI • Secure voice processing
@@ -217,24 +217,24 @@ export default function VoiceAssistant({ isOpen, onClose }: VoiceAssistantProps)
           
           {callState === 'connecting' && (
             <p className="text-gray-600 text-sm">
-              Connecting to your voice assistant...
+              Connecting to Maya...
             </p>
           )}
           
           {callState === 'active' && (
             <>
               <p className="text-gray-600 text-sm">
-                Speak naturally about your travel plans
+                Speak naturally with Maya about your travel plans
               </p>
               <p className="text-gray-500 text-xs">
-                Your AI assistant is listening and ready to help
+                Maya is listening and ready to help
               </p>
             </>
           )}
           
           {callState === 'ended' && (
             <p className="text-gray-600 text-sm">
-              Call ended. Thank you for using voice assistant!
+              Call ended. Thank you for speaking with Maya!
             </p>
           )}
         </div>
@@ -244,7 +244,7 @@ export default function VoiceAssistant({ isOpen, onClose }: VoiceAssistantProps)
           <div className="mt-6 p-4 bg-blue-50 rounded-2xl">
             <h4 className="font-medium text-blue-900 mb-2">Voice Assistant Features:</h4>
             <ul className="text-sm text-blue-700 space-y-1">
-              <li>• Natural conversation about travel plans</li>
+              <li>• Natural conversation with Maya about travel plans</li>
               <li>• Real-time destination recommendations</li>
               <li>• Budget planning and cost estimates</li>
               <li>• Itinerary creation and optimization</li>
