@@ -81,7 +81,7 @@ class VapiService {
       
       this.vapiInstance = window.vapiSDK.run({
         apiKey: apiKey, // mandatory
-        assistant: assistantId, // mandatory
+        assistant: { id: assistantId }, // mandatory
         config: buttonConfig, // optional
       });
 
