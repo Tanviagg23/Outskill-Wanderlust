@@ -59,11 +59,6 @@ class VapiService {
         return false;
       }
 
-      if (!window.VapiWidget) {
-        console.error('VAPI Widget not loaded');
-        return false;
-      }
-
       // Create widget element
       const widgetElement = document.createElement('vapi-widget');
       widgetElement.setAttribute('assistant-id', assistantId);
