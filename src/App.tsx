@@ -416,24 +416,49 @@ function App() {
               <div className="flex flex-col space-y-4">
                 <button 
                   onClick={() => {setActiveTab('home'); setIsMenuOpen(false);}}
-                  className="text-left text-blue-600 font-medium"
+                  className={`text-left font-medium transition-colors duration-200 ${
+                    activeTab === 'home' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                  }`}
                 >
                   Home
                 </button>
                 <button 
                   onClick={() => {setActiveTab('explore'); setIsMenuOpen(false);}}
-                  className="text-left text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
+                  className={`text-left font-medium transition-colors duration-200 ${
+                    activeTab === 'explore' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                  }`}
                 >
                   Explore
                 </button>
                 <button 
                   onClick={() => {setActiveTab('gallery'); setIsMenuOpen(false);}}
-                  className="text-left text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
+                  className={`text-left font-medium transition-colors duration-200 ${
+                    activeTab === 'gallery' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                  }`}
                 >
                   Gallery
                 </button>
-                <button className="text-left text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200">
-                  About
+                <button 
+                  onClick={() => {setShowBudgetPlanner(true); setIsMenuOpen(false);}}
+                  className="text-left text-gray-600 hover:text-blue-600 font-medium transition-colors duration-200"
+                >
+                  Budget Planner
+                </button>
+                <button 
+                  onClick={() => {setActiveTab('itinerary'); setIsMenuOpen(false);}}
+                  className={`text-left font-medium transition-colors duration-200 ${
+                    activeTab === 'itinerary' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                  }`}
+                >
+                  My Trips
+                </button>
+                <button 
+                  onClick={() => {setActiveTab('weather'); setIsMenuOpen(false);}}
+                  className={`text-left font-medium transition-colors duration-200 ${
+                    activeTab === 'weather' ? 'text-blue-600' : 'text-gray-600 hover:text-blue-600'
+                  }`}
+                >
+                  Weather
                 </button>
               </div>
             </div>
