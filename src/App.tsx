@@ -48,7 +48,6 @@ import PackingListModal from './components/PackingListModal';
 import WeatherAlert from './components/WeatherAlert';
 import TestimonialsSection from './components/TestimonialsSection';
 import ImageCarousel from './components/ImageCarousel';
-import BudgetPlannerModal from './components/BudgetPlannerModal';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -61,7 +60,6 @@ function App() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showCollaborateModal, setShowCollaborateModal] = useState(false);
   const [showPackingModal, setShowPackingModal] = useState(false);
-  const [showBudgetPlanner, setShowBudgetPlanner] = useState(false);
 
   const handleSearch = (query: string) => {
     console.log('Searching for:', query);

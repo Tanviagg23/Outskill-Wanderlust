@@ -26,7 +26,7 @@ const testimonials: Testimonial[] = [
     date: '2024-01-15',
     type: 'video',
     content: 'This platform made planning my Bali trip absolutely seamless. The AI recommendations were spot-on, and I discovered hidden gems I never would have found otherwise. The itinerary planning feature saved me hours of research!',
-    videoUrl: 'https://player.vimeo.com/video/1116381494?badge=0&autopause=0&player_id=0&app_id=58479',
+    videoUrl: 'https://app.heygen.com/videos/452e1e02d4854476b1289808ceeea57f',
     videoThumbnail: 'https://images.pexels.com/photos/1559821/pexels-photo-1559821.jpeg?auto=compress&cs=tinysrgb&w=400',
     avatar: 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150',
     tripType: 'Adventure & Culture'
@@ -109,32 +109,23 @@ export default function TestimonialsSection() {
             <div className="relative h-96 lg:h-auto">
               {currentTestimonial.type === 'video' ? (
                 <div className="relative h-full">
-                  {playingVideo === currentTestimonial.id ? (
-                    <iframe
-                      src={currentTestimonial.videoUrl}
-                      className="w-full h-full"
-                      frameBorder="0"
-                      allow="autoplay; encrypted-media"
-                      allowFullScreen
-                      title={`${currentTestimonial.name} testimonial video`}
-                    />
-                  ) : (
-                    <>
-                      <img
-                        src={currentTestimonial.videoThumbnail}
-                        alt={`${currentTestimonial.name} testimonial`}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                        <button
-                          onClick={() => toggleVideo(currentTestimonial.id)}
-                          className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 transform hover:scale-110 shadow-2xl"
-                        >
-                          <Play className="w-8 h-8 text-blue-600 ml-1" />
-                        </button>
-                      </div>
-                    </>
-                  )}
+                  <img
+                    src={currentTestimonial.videoThumbnail}
+                    alt={`${currentTestimonial.name} testimonial`}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                    <button
+                      onClick={() => toggleVideo(currentTestimonial.id)}
+                      className="w-20 h-20 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-all duration-300 transform hover:scale-110 shadow-2xl"
+                    >
+                      {playingVideo === currentTestimonial.id ? (
+                        <Pause className="w-8 h-8 text-blue-600 ml-1" />
+                      ) : (
+                        <Play className="w-8 h-8 text-blue-600 ml-1" />
+                      )}
+                    </button>
+                  </div>
                   <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
                     Video Testimonial
                   </div>
