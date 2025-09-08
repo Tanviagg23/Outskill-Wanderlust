@@ -1,11 +1,17 @@
 declare global {
   interface Window {
-    VapiWidget: any;
+    vapiSDK: {
+      run: (config: {
+        apiKey: string;
+        assistant: string;
+        config?: any;
+      }) => any;
+    };
   }
 }
 
 class VapiService {
-  private widget: any = null;
+  private vapiInstance: any = null;
   private isScriptLoaded = false;
   private scriptLoadPromise: Promise<void> | null = null;
 
@@ -20,7 +26,7 @@ class VapiService {
 
     this.scriptLoadPromise = new Promise((resolve, reject) => {
       // Check if script is already loaded
-      if (window.VapiWidget) {
+      if (window.vapiSDK) {
         this.isScriptLoaded = true;
         resolve();
         return;
@@ -28,9 +34,9 @@ class VapiService {
 
       // Create script element
       const script = document.createElement('script');
-      script.src = 'https://unpkg.com/@vapi-ai/client-sdk-react/dist/embed/widget.umd.js';
+      script.src = 'https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js';
+      script.defer = true;
       script.async = true;
-      script.type = 'text/javascript';
 
       script.onload = () => {
         this.isScriptLoaded = true;
@@ -41,7 +47,13 @@ class VapiService {
         reject(new Error('Failed to load VAPI SDK'));
       };
 
-      document.head.appendChild(script);
+      // Insert script into document
+      const firstScript = document.getElementsByTagName('script')[0];
+      if (firstScript && firstScript.parentNode) {
+        firstScript.parentNode.insertBefore(script, firstScript);
+      } else {
+        document.head.appendChild(script);
+      }
     });
 
     return this.scriptLoadPromise;
@@ -51,29 +63,28 @@ class VapiService {
     try {
       await this.loadVapiScript();
 
-      const publicKey = import.meta.env.VITE_VAPI_API_KEY;
+      const apiKey = import.meta.env.VITE_VAPI_API_KEY;
       const assistantId = import.meta.env.VITE_VAPI_ASSISTANT_ID;
 
-      if (!publicKey || !assistantId) {
-        console.warn('VAPI public key or Assistant ID not found in environment variables');
+      if (!apiKey || !assistantId) {
+        console.warn('VAPI API key or Assistant ID not found in environment variables');
         return false;
       }
 
-      if (!window.VapiWidget) {
-        console.error('VAPI Widget not loaded');
+      if (!window.vapiSDK) {
+        console.error('VAPI SDK not loaded');
         return false;
       }
 
-      // Create widget element
-      const widgetElement = document.createElement('vapi-widget');
-      widgetElement.setAttribute('assistant-id', assistantId);
-      widgetElement.setAttribute('public-key', publicKey);
+      // Initialize VAPI instance using the provided script format
+      const buttonConfig = {}; // Modify this as required
       
-      // Hide the widget initially
-      widgetElement.style.display = 'none';
-      document.body.appendChild(widgetElement);
+      this.vapiInstance = window.vapiSDK.run({
+        apiKey: apiKey, // mandatory
+        assistant: assistantId, // mandatory
+        config: buttonConfig, // optional
+      });
 
-      this.widget = widgetElement;
       return true;
     } catch (error) {
       console.error('Failed to initialize VAPI:', error);
@@ -83,22 +94,21 @@ class VapiService {
 
   async startCall(): Promise<boolean> {
     try {
-      if (!this.widget) {
+      if (!this.vapiInstance) {
         const initialized = await this.initializeVapi();
         if (!initialized) {
           return false;
         }
       }
 
-      // Trigger the widget to start call
-      if (this.widget) {
-        // Simulate click on the widget to start call
-        const event = new Event('click', { bubbles: true });
-        this.widget.dispatchEvent(event);
+      // Start the call using VAPI instance
+      if (this.vapiInstance && typeof this.vapiInstance.start === 'function') {
+        await this.vapiInstance.start();
         return true;
+      } else {
+        console.error('VAPI instance not properly initialized or start method not available');
+        return false;
       }
-
-      return false;
     } catch (error) {
       console.error('Failed to start VAPI call:', error);
       return false;
@@ -107,10 +117,8 @@ class VapiService {
 
   async endCall(): Promise<void> {
     try {
-      if (this.widget) {
-        // Try to end the call - this depends on the widget's API
-        const event = new Event('end-call', { bubbles: true });
-        this.widget.dispatchEvent(event);
+      if (this.vapiInstance && typeof this.vapiInstance.stop === 'function') {
+        await this.vapiInstance.stop();
       }
     } catch (error) {
       console.error('Failed to end VAPI call:', error);
@@ -118,13 +126,13 @@ class VapiService {
   }
 
   isConfigured(): boolean {
-    const publicKey = import.meta.env.VITE_VAPI_API_KEY;
+    const apiKey = import.meta.env.VITE_VAPI_API_KEY;
     const assistantId = import.meta.env.VITE_VAPI_ASSISTANT_ID;
-    return !!(publicKey && assistantId);
+    return !!(apiKey && assistantId);
   }
 
-  getWidget() {
-    return this.widget;
+  getVapiInstance() {
+    return this.vapiInstance;
   }
 }
 
