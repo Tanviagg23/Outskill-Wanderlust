@@ -48,7 +48,6 @@ import PackingListModal from './components/PackingListModal';
 import WeatherAlert from './components/WeatherAlert';
 import TestimonialsSection from './components/TestimonialsSection';
 import ImageCarousel from './components/ImageCarousel';
-import BudgetPlannerModal from './components/BudgetPlannerModal';
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -61,7 +60,6 @@ function App() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showCollaborateModal, setShowCollaborateModal] = useState(false);
   const [showPackingModal, setShowPackingModal] = useState(false);
-  const [showBudgetPlanner, setShowBudgetPlanner] = useState(false);
 
   const handleSearch = (query: string) => {
     console.log('Searching for:', query);
@@ -151,7 +149,7 @@ function App() {
       name: 'Kerala',
       country: 'India',
       images: [
-        'https://images.pexels.com/photos/962464/pexels-photo-962464.jpeg?auto=compress&cs=tinysrgb&w=800'
+        'https://images.pexels.com/photos/3889855/pexels-photo-3889855.jpeg?auto=compress&cs=tinysrgb&w=800'
       ],
       rating: 4.7,
       reviews: 1923,
